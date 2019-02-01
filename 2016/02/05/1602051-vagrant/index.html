@@ -1,0 +1,586 @@
+<!DOCTYPE html>
+<html>
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="utf-8">
+  
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no, minimal-ui">
+  <meta name="renderer" content="webkit">
+  <meta http-equiv="Cache-Control" content="no-transform">
+  <meta http-equiv="Cache-Control" content="no-siteapp">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black">
+  <meta name="format-detection" content="telephone=no,email=no,adress=no">
+  <!-- Color theme for statusbar -->
+  <meta name="theme-color" content="#000000">
+  <!-- 强制页面在当前窗口以独立页面显示,防止别人在框架里调用页面 -->
+  <meta http-equiv="window-target" content="_top">
+  
+  
+  <title>Vagrant+Virtualbox 打造统一的部署环境 | Hexo</title>
+  <meta name="description" content="可能大家都有遇到过，同一套代码，在你的电脑上出问题，但在我的电脑上却不会出问题。其实这都是因为部署环境的差异造成的。Vagrant+ Virtualbox就是解决这种问题的其中一套解决方案。 1.安装Vagrant和VitualBox首先Vagrant和Virtualbox的下载安装是很简单的 Vagrant的下载地址:https://www.vagrantup.com/ Virtualbox的下">
+<meta name="keywords" content="vagrant,linux">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Vagrant+Virtualbox 打造统一的部署环境">
+<meta property="og:url" content="http://yoursite.com/2016/02/05/1602051-vagrant/index.html">
+<meta property="og:site_name" content="Hexo">
+<meta property="og:description" content="可能大家都有遇到过，同一套代码，在你的电脑上出问题，但在我的电脑上却不会出问题。其实这都是因为部署环境的差异造成的。Vagrant+ Virtualbox就是解决这种问题的其中一套解决方案。 1.安装Vagrant和VitualBox首先Vagrant和Virtualbox的下载安装是很简单的 Vagrant的下载地址:https://www.vagrantup.com/ Virtualbox的下">
+<meta property="og:locale" content="default">
+<meta property="og:image" content="https://img.alicdn.com/imgextra/i4/432719213/TB20gJbbMSI.eBjy1XcXXc1jXXa_!!432719213.png">
+<meta property="og:updated_time" content="2019-01-31T15:37:29.073Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Vagrant+Virtualbox 打造统一的部署环境">
+<meta name="twitter:description" content="可能大家都有遇到过，同一套代码，在你的电脑上出问题，但在我的电脑上却不会出问题。其实这都是因为部署环境的差异造成的。Vagrant+ Virtualbox就是解决这种问题的其中一套解决方案。 1.安装Vagrant和VitualBox首先Vagrant和Virtualbox的下载安装是很简单的 Vagrant的下载地址:https://www.vagrantup.com/ Virtualbox的下">
+<meta name="twitter:image" content="https://img.alicdn.com/imgextra/i4/432719213/TB20gJbbMSI.eBjy1XcXXc1jXXa_!!432719213.png">
+  <!-- Canonical links -->
+  <link rel="canonical" href="http://yoursite.com/2016/02/05/1602051-vagrant/index.html">
+  
+    <link rel="alternate" href="/atom.xml" title="Hexo" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.png" type="image/x-icon">
+  
+  <link rel="stylesheet" href="/css/style.css">
+  
+  
+  
+  
+</head>
+
+
+<body class="main-center" itemscope itemtype="http://schema.org/WebPage">
+  <header class="header" itemscope="" itemtype="http://schema.org/WPHeader">
+  <div class="slimContent">
+    <div class="navbar-header">
+      
+      
+      <div class="profile-block text-center">
+        <a id="avatar" href="https://github.com/gantrylau" target="_blank">
+          <img class="img-circle img-rotate" src="https://img.alicdn.com/imgextra/i2/432719213/TB2OvU8bCiJ.eBjSspiXXbqAFXa_!!432719213.png" width="200" height="200">
+        </a>
+        <h2 id="name" class="hidden-xs hidden-sm">gantrylau</h2>
+        <h3 id="title" class="hidden-xs hidden-sm hidden-md">Web开发者</h3>
+        <small id="location" class="text-muted hidden-xs hidden-sm"><i class="icon icon-map-marker"></i> Guangzhou, China</small>
+      </div>
+      
+      <div class="search" id="search-form-wrap">
+
+    <form class="search-form sidebar-form">
+        <div class="input-group">
+            <input type="text" class="search-form-input form-control" placeholder="Search">
+            <span class="input-group-btn">
+                <button type="submit" class="search-form-submit btn btn-flat" onclick="return false;"><i class="icon icon-search"></i></button>
+            </span>
+        </div>
+    </form>
+    <div class="ins-search">
+  <div class="ins-search-mask"></div>
+  <div class="ins-search-container">
+    <div class="ins-input-wrapper">
+      <input type="text" class="ins-search-input" placeholder="Type something..." x-webkit-speech="">
+      <button type="button" class="close ins-close ins-selectable" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>
+    </div>
+    <div class="ins-section-wrapper">
+      <div class="ins-section-container"></div>
+    </div>
+  </div>
+</div>
+
+
+</div>
+      <button class="navbar-toggle collapsed" type="button" data-toggle="collapse" data-target="#main-navbar" aria-controls="main-navbar" aria-expanded="false">
+        <span class="sr-only">Toggle navigation</span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+    </div>
+    <nav id="main-navbar" class="collapse navbar-collapse" itemscope="" itemtype="http://schema.org/SiteNavigationElement" role="navigation">
+      <ul class="nav navbar-nav main-nav ">
+        
+        
+        <li class="menu-item menu-item-home">
+          <a href="/.">
+            
+            <i class="icon icon-home-fill"></i>
+            
+            <span class="menu-title">Home</span>
+          </a>
+        </li>
+        
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives">
+            
+            <i class="icon icon-archives-fill"></i>
+            
+            <span class="menu-title">Archives</span>
+          </a>
+        </li>
+        
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories">
+            
+            <i class="icon icon-folder"></i>
+            
+            <span class="menu-title">Categories</span>
+          </a>
+        </li>
+        
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags">
+            
+            <i class="icon icon-tags"></i>
+            
+            <span class="menu-title">Tags</span>
+          </a>
+        </li>
+        
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about">
+            
+            <i class="icon icon-cup-fill"></i>
+            
+            <span class="menu-title">About</span>
+          </a>
+        </li>
+        
+      </ul>
+      
+	
+    <ul class="social-links">
+    	
+        <li><a href="https://github.com/gantrylau" target="_blank" title="Github" data-toggle="tooltip" data-placement="top"><i class="icon icon-github"></i></a></li>
+        
+        <li><a href="https://weibo.com/gantry" target="_blank" title="Weibo" data-toggle="tooltip" data-placement="top"><i class="icon icon-weibo"></i></a></li>
+        
+        <li><a href="/gantrylau@qq.com" target="_blank" title="Email" data-toggle="tooltip" data-placement="top"><i class="icon icon-email"></i></a></li>
+        
+    </ul>
+
+    </nav>
+  </div>
+</header>
+
+  
+    <aside class="sidebar" itemscope="" itemtype="http://schema.org/WPSideBar">
+  <div class="slimContent">
+    
+      
+  <div class="widget">
+    <h3 class="widget-title">Categories</h3>
+    <div class="widget-body">
+      <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/其它/">其它</a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/备忘/">备忘</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/应用/">应用</a><span class="category-list-count">6</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/应用-实战/">应用, 实战</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/数据库/">数据库</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/编码/">编码</a><span class="category-list-count">6</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/配置/">配置</a><span class="category-list-count">2</span></li></ul>
+    </div>
+  </div>
+
+
+    
+      
+  <div class="widget">
+    <h3 class="widget-title">Tags</h3>
+    <div class="widget-body">
+      <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/angularjs/">angularjs</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/css/">css</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/git/">git</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/hibernate/">hibernate</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/html/">html</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/java/">java</a><span class="tag-list-count">11</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/js/">js</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/linux/">linux</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/maven/">maven</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/mybatis/">mybatis</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/mysql/">mysql</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/spring/">spring</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ssh/">ssh</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/swt/">swt</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/vagrant/">vagrant</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/webpack/">webpack</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/多线程/">多线程</a><span class="tag-list-count">1</span></li></ul>
+    </div>
+  </div>
+
+
+    
+      
+  <div class="widget">
+    <h3 class="widget-title">Tag Cloud</h3>
+    <div class="widget-body tagcloud">
+      <a href="/tags/angularjs/" style="font-size: 13px;">angularjs</a> <a href="/tags/css/" style="font-size: 13px;">css</a> <a href="/tags/git/" style="font-size: 13px;">git</a> <a href="/tags/hibernate/" style="font-size: 13px;">hibernate</a> <a href="/tags/html/" style="font-size: 13px;">html</a> <a href="/tags/java/" style="font-size: 14px;">java</a> <a href="/tags/js/" style="font-size: 13px;">js</a> <a href="/tags/linux/" style="font-size: 13.67px;">linux</a> <a href="/tags/maven/" style="font-size: 13px;">maven</a> <a href="/tags/mybatis/" style="font-size: 13px;">mybatis</a> <a href="/tags/mysql/" style="font-size: 13px;">mysql</a> <a href="/tags/spring/" style="font-size: 13.33px;">spring</a> <a href="/tags/ssh/" style="font-size: 13px;">ssh</a> <a href="/tags/swt/" style="font-size: 13px;">swt</a> <a href="/tags/vagrant/" style="font-size: 13px;">vagrant</a> <a href="/tags/webpack/" style="font-size: 13px;">webpack</a> <a href="/tags/多线程/" style="font-size: 13px;">多线程</a>
+    </div>
+  </div>
+
+    
+      
+  <div class="widget">
+    <h3 class="widget-title">Archive</h3>
+    <div class="widget-body">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/01/">January 2019</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/02/">February 2017</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/01/">January 2017</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/09/">September 2016</a><span class="archive-list-count">4</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/03/">March 2016</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/02/">February 2016</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/01/">January 2016</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/11/">November 2015</a><span class="archive-list-count">5</span></li></ul>
+    </div>
+  </div>
+
+
+    
+      
+  <div class="widget">
+    <h3 class="widget-title">Recent Posts</h3>
+    <div class="widget-body">
+      <ul class="recent-post-list list-unstyled no-thumbnail">
+        
+          <li>
+            
+            <div class="item-inner">
+              <p class="item-category">
+                <a class="category-link" href="/categories/其它/">其它</a>
+              </p>
+              <p class="item-title">
+                <a href="/2019/01/31/170117-vimusage/" class="title">VM详细用法都在这里</a>
+              </p>
+              <p class="item-date">
+                <time datetime="2019-01-31T15:37:29.074Z" itemprop="datePublished">2019-01-31</time>
+              </p>
+            </div>
+          </li>
+          
+          <li>
+            
+            <div class="item-inner">
+              <p class="item-category">
+                <a class="category-link" href="/categories/配置/">配置</a>
+              </p>
+              <p class="item-title">
+                <a href="/2017/02/19/170216-hiberante5/" class="title">Hibernate5的Naming strategies</a>
+              </p>
+              <p class="item-date">
+                <time datetime="2017-02-19T15:07:00.000Z" itemprop="datePublished">2017-02-19</time>
+              </p>
+            </div>
+          </li>
+          
+          <li>
+            
+            <div class="item-inner">
+              <p class="item-category">
+                <a class="category-link" href="/categories/配置/">配置</a>
+              </p>
+              <p class="item-title">
+                <a href="/2017/02/16/170216-yaml/" class="title">使用YAML代替Properties</a>
+              </p>
+              <p class="item-date">
+                <time datetime="2017-02-16T13:07:00.000Z" itemprop="datePublished">2017-02-16</time>
+              </p>
+            </div>
+          </li>
+          
+          <li>
+            
+            <div class="item-inner">
+              <p class="item-category">
+                <a class="category-link" href="/categories/数据库/">数据库</a>
+              </p>
+              <p class="item-title">
+                <a href="/2017/01/24/170119-mysql/" class="title">Linux下MySQL的安装及使用</a>
+              </p>
+              <p class="item-date">
+                <time datetime="2017-01-24T14:10:00.000Z" itemprop="datePublished">2017-01-24</time>
+              </p>
+            </div>
+          </li>
+          
+          <li>
+            
+            <div class="item-inner">
+              <p class="item-category">
+                <a class="category-link" href="/categories/应用/">应用</a>
+              </p>
+              <p class="item-title">
+                <a href="/2017/01/19/170119-httpclient/" class="title">使用HttpClient上传文件</a>
+              </p>
+              <p class="item-date">
+                <time datetime="2017-01-19T14:19:00.000Z" itemprop="datePublished">2017-01-19</time>
+              </p>
+            </div>
+          </li>
+          
+      </ul>
+    </div>
+  </div>
+  
+
+    
+  </div>
+</aside>
+
+  
+  
+<main class="main" role="main">
+  <div class="content">
+  <article id="post-1602051-vagrant" class="article article-type-post" itemscope="" itemtype="http://schema.org/BlogPosting">
+    
+    <div class="article-header">
+      
+        
+  
+    <h1 class="article-title" itemprop="name">
+      Vagrant+Virtualbox 打造统一的部署环境
+    </h1>
+  
+
+      
+      <div class="article-meta">
+        <span class="article-date">
+    <i class="icon icon-calendar-check"></i>
+	<a href="/2016/02/05/1602051-vagrant/" class="article-date">
+	  <time datetime="2016-02-05T05:30:00.000Z" itemprop="datePublished">2016-02-05</time>
+	</a>
+</span>
+        
+  <span class="article-category">
+    <i class="icon icon-folder"></i>
+    <a class="article-category-link" href="/categories/应用/">应用</a>
+  </span>
+
+        
+  <span class="article-tag">
+    <i class="icon icon-tags"></i>
+	<a class="article-tag-link" href="/tags/linux/">linux</a>, <a class="article-tag-link" href="/tags/vagrant/">vagrant</a>
+  </span>
+
+
+        
+
+        <span class="post-comment"><i class="icon icon-comment"></i> <a href="/2016/02/05/1602051-vagrant/#comments" class="article-comment-link">Comments</a></span>
+        
+      </div>
+    </div>
+    <div class="article-entry marked-body" itemprop="articleBody">
+      
+        <p>可能大家都有遇到过，同一套代码，在你的电脑上出问题，但在我的电脑上却不会出问题。其实这都是因为部署环境的差异造成的。Vagrant+ Virtualbox就是解决这种问题的其中一套解决方案。</p>
+<h1 id="1-安装Vagrant和VitualBox"><a href="#1-安装Vagrant和VitualBox" class="headerlink" title="1.安装Vagrant和VitualBox"></a>1.安装Vagrant和VitualBox</h1><p>首先Vagrant和Virtualbox的下载安装是很简单的</p>
+<p>Vagrant的下载地址:<a href="https://www.vagrantup.com/" target="_blank" rel="noopener">https://www.vagrantup.com/</a></p>
+<p>Virtualbox的下载地址:<a href="https://www.virtualbox.org/" target="_blank" rel="noopener">https://www.virtualbox.org/</a></p>
+<p>下载好直接安装就可以，此外还要下载官方封装好的镜像</p>
+<p>vagrantbox镜像的下载地址：<a href="http://www.vagrantbox.es/" target="_blank" rel="noopener">http://www.vagrantbox.es/</a></p>
+<h1 id="2-添加镜像到Vagrant"><a href="#2-添加镜像到Vagrant" class="headerlink" title="2.添加镜像到Vagrant"></a>2.添加镜像到Vagrant</h1><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">vagrant box add centos65 /vagrant/centos/centos65-x86_64.box</span><br></pre></td></tr></table></figure>
+<p>添加之后 vagrant就有拥有一个名字叫做centos65的虚拟机</p>
+<h1 id="3-初始化环境"><a href="#3-初始化环境" class="headerlink" title="3.初始化环境"></a>3.初始化环境</h1><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">cd</span> /vagrant/centos <span class="comment">##切换目录，随意</span></span><br><span class="line">vagrant init centos65 <span class="comment">##为centos65初始化一个环境</span></span><br></pre></td></tr></table></figure>
+<p>执行命令后，<code>/vagrant/centos</code>目录下会有一个叫Vagrantfile的文件</p>
+<p>简单介绍一下这个配置文件：</p>
+<p><code>config.vm.network &quot;private_network&quot;, ip: &quot;192.168.33.10&quot;</code></p>
+<p>打开这段配置后，虚拟机会拥有一个为192.168.33.10的IP,宿主可以通过ssh访问到这个虚拟机。</p>
+<p><code>config.vm.synced_folder &quot;../data&quot;, &quot;/vagrant_data&quot;</code></p>
+<p>vagrant可以为虚拟机提供一个映射目录，这样可以很简便地为虚拟机与宿主之间共享文件</p>
+<p><code>config.vm.network &quot;forwarded_port&quot;, guest: 80, host: 8080</code></p>
+<p>打开这段注释后，表示将宿主的8080端口的TCP请求转发到虚拟机的80端口中</p>
+<p><code>config.vm.forwarded_port 80, 8080, protocol: &quot;udp&quot;</code></p>
+<p>默认是转发TCP的请求，如果需要转发UDP的，要加上protocol</p>
+<h1 id="4-启动虚拟机"><a href="#4-启动虚拟机" class="headerlink" title="4.启动虚拟机"></a>4.启动虚拟机</h1><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">cd</span> /vagrant/centos/centos65-x86_64.box</span><br><span class="line">vagrant up</span><br></pre></td></tr></table></figure>
+<p>出现以下界面则表示成功了<br><img src="https://img.alicdn.com/imgextra/i4/432719213/TB20gJbbMSI.eBjy1XcXXc1jXXa_!!432719213.png" alt="成功后的图"></p>
+<h1 id="5-连接虚拟机"><a href="#5-连接虚拟机" class="headerlink" title="5.连接虚拟机"></a>5.连接虚拟机</h1><p>在vagrant的目录使用<code>vagrant ssh</code>即可，默认的密码是<code>vagrant</code>，也可以在配置文件里配置默认登录的帐号</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">config.ssh.username=&quot;root&quot;</span><br><span class="line">config.ssh.password=&quot;vagrant&quot;</span><br></pre></td></tr></table></figure>
+<h1 id="6-打包Box"><a href="#6-打包Box" class="headerlink" title="6.打包Box"></a>6.打包Box</h1><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">vagrant package -hUsage: vagrant package [options] [name]Options:</span><br><span class="line">        --base NAME                  virtualbox程序里面的虚拟机的名称，不是box的名字也不是Vagrantfile里面的虚拟机名称.默认是打包当前目录下面的虚拟机。</span><br><span class="line">        --output NAME                要打包成的box名称，不会自动添加.box后缀，要手动加.默认值package.box        --include FILE...            打包时包含的文件名，你可以把.box文件理解为一个压缩包</span><br><span class="line">        --vagrantfile FILE           打包时包含的Vagrantfile文件，原理和上面类似</span><br></pre></td></tr></table></figure>
+<p>示例：<code>vagrant package --base centos65 --output centos65x64.box --vagrantfile Vagrantfile</code></p>
+
+      
+    </div>
+    <div class="article-footer">
+      <blockquote class="mt-2x">
+  <ul class="post-copyright list-unstyled">
+    
+    <li class="post-copyright-link hidden-xs">
+      <strong>本文链接：</strong>
+      <a href="http://yoursite.com/2016/02/05/1602051-vagrant/" title="Vagrant+Virtualbox 打造统一的部署环境" target="_blank" rel="external">http://yoursite.com/2016/02/05/1602051-vagrant/</a>
+    </li>
+    
+    <li class="post-copyright-license">
+      <strong>版权声明： </strong> 本博客所有文章除特别声明外，均采用 <a href="http://creativecommons.org/licenses/by/4.0/deed.zh" target="_blank" rel="external">CC BY 4.0 CN协议</a> 许可协议。转载请注明出处！
+    </li>
+  </ul>
+</blockquote>
+
+
+<div class="panel panel-default panel-badger">
+  <div class="panel-body">
+    <figure class="media">
+      <div class="media-left">
+        <a href="https://github.com/gantrylau" target="_blank" class="img-burn thumb-sm visible-lg">
+          <img src="https://img.alicdn.com/imgextra/i2/432719213/TB2OvU8bCiJ.eBjSspiXXbqAFXa_!!432719213.png" class="img-rounded w-full" alt="">
+        </a>
+      </div>
+      <div class="media-body">
+        <h3 class="media-heading"><a href="https://github.com/gantrylau" target="_blank"><span class="text-dark">gantrylau</span><small class="ml-1x">Web开发者</small></a></h3>
+        <div>Actions speak louder than words</div>
+      </div>
+    </figure>
+  </div>
+</div>
+
+
+    </div>
+  </article>
+  
+    
+  <section id="comments">
+  	
+      <div id="vcomments"></div>
+    
+  </section>
+
+
+  
+</div>
+
+  <nav class="bar bar-footer clearfix" data-stick-bottom="">
+  <div class="bar-inner">
+  
+  <ul class="pager pull-left">
+    
+    <li class="prev">
+      <a href="/2016/03/20/1603201/" title="实用的开源工具库Guava之Table"><i class="icon icon-angle-left" aria-hidden="true"></i><span>&nbsp;&nbsp;Newer</span></a>
+    </li>
+    
+    
+    <li class="next">
+      <a href="/2016/01/07/1601072/" title="java中的并发编程"><span>Older&nbsp;&nbsp;</span><i class="icon icon-angle-right" aria-hidden="true"></i></a>
+    </li>
+    
+    
+  </ul>
+  
+  
+  <!-- Button trigger modal -->
+  <button type="button" class="btn btn-fancy btn-donate pop-onhover bg-gradient-warning" data-toggle="modal" data-target="#donateModal"><span>$</span></button>
+  <!-- <div class="wave-icon wave-icon-danger btn-donate" data-toggle="modal" data-target="#donateModal">
+    <div class="wave-circle"><span class="icon"><i class="icon icon-bill"></i></span></div>
+  </div> -->
+  
+  
+  <div class="bar-right">
+    
+    <div class="share-component" data-sites="weibo,qq,wechat,facebook,twitter" data-mobile-sites="weibo,qq,qzone"></div>
+    
+  </div>
+  </div>
+</nav>
+  
+<!-- Modal -->
+<div class="modal modal-center modal-small modal-xs-full fade" id="donateModal" tabindex="-1" role="dialog">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content donate">
+      <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+      <div class="modal-body">
+        <div class="donate-box">
+          <div class="donate-head">
+            <p>Maybe you could buy me a cup of coffee.</p>
+          </div>
+          <div class="tab-content">
+            <div role="tabpanel" class="tab-pane fade active in" id="alipay">
+              <div class="donate-payimg">
+                <img src="/images/donate/alipayimg.png" alt="Scan Qrcode" title="Scan">
+              </div>
+              <p class="text-muted mv">Scan this qrcode</p>
+              <p class="text-grey">Open alipay app scan this qrcode, buy me a coffee!</p>
+            </div>
+            <div role="tabpanel" class="tab-pane fade" id="wechatpay">
+              <div class="donate-payimg">
+                <img src="/images/donate/wechatpayimg.png" alt="Scan Qrcode" title="Scan">
+              </div>
+              <p class="text-muted mv">Scan this qrcode</p>
+              <p class="text-grey">Open wechat app scan this qrcode, buy me a coffee!</p>
+            </div>
+          </div>
+          <div class="donate-footer">
+            <ul class="nav nav-tabs nav-justified" role="tablist">
+              <li role="presentation" class="active">
+                <a href="#alipay" id="alipay-tab" role="tab" data-toggle="tab" aria-controls="alipay" aria-expanded="true"><i class="icon icon-alipay"></i> alipay</a>
+              </li>
+              <li role="presentation" class="">
+                <a href="#wechatpay" role="tab" id="wechatpay-tab" data-toggle="tab" aria-controls="wechatpay" aria-expanded="false"><i class="icon icon-wepay"></i> wechat payment</a>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+</main>
+
+  <footer class="footer" itemscope="" itemtype="http://schema.org/WPFooter">
+	
+	
+    <ul class="social-links">
+    	
+        <li><a href="https://github.com/gantrylau" target="_blank" title="Github" data-toggle="tooltip" data-placement="top"><i class="icon icon-github"></i></a></li>
+        
+        <li><a href="https://weibo.com/gantry" target="_blank" title="Weibo" data-toggle="tooltip" data-placement="top"><i class="icon icon-weibo"></i></a></li>
+        
+        <li><a href="/gantrylau@qq.com" target="_blank" title="Email" data-toggle="tooltip" data-placement="top"><i class="icon icon-email"></i></a></li>
+        
+    </ul>
+
+    <div class="copyright">
+    	
+        <div class="publishby">
+        	Theme by <a href="https://github.com/cofess" target="_blank"> cofess </a>base on <a href="https://github.com/cofess/hexo-theme-pure" target="_blank">pure</a>.
+        </div>
+    </div>
+</footer>
+  <script src="//cdn.jsdelivr.net/npm/jquery@1.12.4/dist/jquery.min.js"></script>
+<script>
+window.jQuery || document.write('<script src="js/jquery.min.js"><\/script>')
+</script>
+<script src="/js/plugin.min.js"></script>
+<script src="/js/application.js"></script>
+
+    <script>
+(function (window) {
+    var INSIGHT_CONFIG = {
+        TRANSLATION: {
+            POSTS: 'Posts',
+            PAGES: 'Pages',
+            CATEGORIES: 'Categories',
+            TAGS: 'Tags',
+            UNTITLED: '(Untitled)',
+        },
+        ROOT_URL: '/',
+        CONTENT_URL: '/content.json',
+    };
+    window.INSIGHT_CONFIG = INSIGHT_CONFIG;
+})(window);
+</script>
+<script src="/js/insight.js"></script>
+
+
+
+
+
+   
+
+
+
+
+   
+    
+  <script src="//cdn1.lncld.net/static/js/3.0.4/av-min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/valine"></script>
+  <script type="text/javascript">
+  var GUEST = ['nick', 'mail', 'link'];
+  var meta = 'nick,mail,link';
+  meta = meta.split(',').filter(function(item) {
+    return GUEST.indexOf(item) > -1;
+  });
+  new Valine({
+    el: '#vcomments',
+    verify: false,
+    notify: false,
+    appId: '',
+    appKey: '',
+    placeholder: 'Just go go',
+    avatar: 'mm',
+    meta: meta,
+    pageSize: '10' || 10,
+    visitor: false
+  });
+  </script>
+
+     
+
+
+
+
+
+
+
+</body>
+</html>
