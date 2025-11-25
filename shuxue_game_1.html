@@ -100,15 +100,18 @@
             box-shadow: none;
         }
 
+        /* 答对样式 */
         .option-btn.correct {
-            background-color: var(--success-color);
-            box-shadow: 0 4px #27ae60;
+            background-color: var(--success-color) !important;
+            box-shadow: 0 4px #27ae60 !important;
+            transform: scale(1.05);
         }
 
+        /* 答错样式 */
         .option-btn.wrong {
-            background-color: var(--error-color);
-            box-shadow: 0 4px #c0392b;
-            animation: shake 0.5s;
+            background-color: var(--error-color) !important;
+            box-shadow: 0 4px #c0392b !important;
+            opacity: 0.7;
         }
 
         /* 界面切换 */
@@ -157,11 +160,6 @@
             display: flex;
             flex-direction: column;
             gap: 10px;
-        }
-        
-        .result-detail {
-            font-size: 1rem;
-            color: #7f8c8d;
         }
 
         /* 历史记录样式 */
@@ -224,14 +222,6 @@
             font-style: italic;
         }
 
-        @keyframes shake {
-            0% { transform: translateX(0); }
-            25% { transform: translateX(-10px); }
-            50% { transform: translateX(10px); }
-            75% { transform: translateX(-10px); }
-            100% { transform: translateX(0); }
-        }
-
         @media (max-width: 600px) {
             .question-box { font-size: 2.5rem; }
             .option-btn { font-size: 1.4rem; padding: 12px; }
@@ -256,7 +246,7 @@
             <div class="progress-bar">
                 <div id="progress-fill" class="progress-fill"></div>
             </div>
-            <div style="font-size: 1rem; color: #777;">第 <span id="current-q">1</span>/10 题</div>
+            <div style="font-size: 1rem; color: #777;">累计答对：<span id="current-q">0</span>/10</div>
             <div id="question-display" class="question-box"></div>
             <div id="options-container" class="options-grid">
                 <!-- 选项通过JS生成 -->
@@ -287,12 +277,12 @@
 
 <script>
     // 游戏状态变量
-    let currentScore = 0;
+    let currentScore = 0; // 当前答对题数
     const targetScore = 10;
-    let mistakeCount = 0; // 新增：错误计数
+    let mistakeCount = 0; // 错误计数
     let startTime = 0;
     let currentAnswer = 0;
-    let isProcessing = false;
+    let isProcessing = false; // 锁定状态，防止重复点击
 
     // 音频上下文
     const AudioContext = window.AudioContext || window.webkitAudioContext;
@@ -323,13 +313,14 @@
             osc.start();
             osc.stop(audioCtx.currentTime + 0.5);
         } else {
+            // 错误音效：更低沉的嗡嗡声
             osc.type = 'sawtooth';
             osc.frequency.setValueAtTime(150, audioCtx.currentTime);
-            osc.frequency.linearRampToValueAtTime(100, audioCtx.currentTime + 0.3);
+            osc.frequency.linearRampToValueAtTime(80, audioCtx.currentTime + 0.4);
             gainNode.gain.setValueAtTime(0.3, audioCtx.currentTime);
-            gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.3);
+            gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.4);
             osc.start();
-            osc.stop(audioCtx.currentTime + 0.3);
+            osc.stop(audioCtx.currentTime + 0.4);
         }
     }
 
@@ -349,7 +340,7 @@
         switchScreen('game-screen');
         
         currentScore = 0;
-        mistakeCount = 0; // 重置错误数
+        mistakeCount = 0;
         startTime = new Date();
         updateProgress();
         nextQuestion();
@@ -365,8 +356,8 @@
             return;
         }
 
-        isProcessing = false;
-        document.getElementById('current-q').innerText = currentScore + 1;
+        isProcessing = false; // 解锁
+        document.getElementById('current-q').innerText = currentScore;
         
         const type = Math.random() > 0.5 ? 0 : 1;
         let num1, num2, symbol, textToRead;
@@ -410,26 +401,47 @@
             const btn = document.createElement('button');
             btn.className = 'option-btn';
             btn.innerText = opt;
+            // 将 onclick 事件绑定修改
             btn.onclick = () => checkAnswer(btn, opt);
             container.appendChild(btn);
         });
     }
 
+    // 核心修改：检查答案逻辑
     function checkAnswer(btn, value) {
-        if (isProcessing) return;
+        if (isProcessing) return; // 如果正在处理（比如显示答案中），不允许点击
+        isProcessing = true; // 锁定界面
 
         if (value === currentAnswer) {
-            isProcessing = true;
+            // --- 答对 ---
             btn.classList.add('correct');
             playSound('correct');
             currentScore++;
             updateProgress();
-            setTimeout(() => nextQuestion(), 800);
+            
+            // 1秒后下一题
+            setTimeout(() => {
+                nextQuestion();
+            }, 1000);
+
         } else {
-            mistakeCount++; // 记录错误
-            btn.classList.add('wrong');
+            // --- 答错 ---
+            mistakeCount++; // 记一次过
+            btn.classList.add('wrong'); // 选错的变红
             playSound('wrong');
-            setTimeout(() => btn.classList.remove('wrong'), 500);
+
+            // 自动找出正确的按钮并变绿
+            const allBtns = document.querySelectorAll('.option-btn');
+            allBtns.forEach(b => {
+                if (parseInt(b.innerText) === currentAnswer) {
+                    b.classList.add('correct');
+                }
+            });
+
+            // 1.5秒让孩子看清答案，然后自动换新题（不加分）
+            setTimeout(() => {
+                nextQuestion();
+            }, 1500);
         }
     }
 
@@ -447,6 +459,7 @@
         const timeString = mins > 0 ? `${mins}分${secs}秒` : `${secs}秒`;
 
         // 计算正确率
+        // 总尝试次数 = 答对的10次 + 答错的次数
         const totalAttempts = targetScore + mistakeCount;
         const accuracy = Math.round((targetScore / totalAttempts) * 100);
         const accuracyString = `${accuracy}%`;
@@ -502,7 +515,7 @@
         }
 
         history.forEach((item, index) => {
-            const acc = item.accuracy ? item.accuracy : '-'; // 兼容旧数据
+            const acc = item.accuracy ? item.accuracy : '-';
             
             const li = document.createElement('li');
             li.className = 'history-item';
