@@ -23,6 +23,7 @@
             justify-content: center;
             height: 100vh;
             margin: 0;
+            padding: 20px;
             overflow: hidden;
             user-select: none;
         }
@@ -234,7 +235,8 @@
         <!-- 开始界面 -->
         <div id="start-screen" class="screen active">
             <h1>🧮 数学大挑战</h1>
-            <p>20以内加减法，答对10题通关</p>
+            <p>20以内加减法 (无0和1)</p>
+            <p style="font-size: 0.9rem; color: #666;">答对10题通关</p>
             <br>
             <button class="btn start-btn" onclick="startGame()">开始挑战</button>
             <br>
@@ -313,7 +315,7 @@
             osc.start();
             osc.stop(audioCtx.currentTime + 0.5);
         } else {
-            // 错误音效：更低沉的嗡嗡声
+            // 错误音效
             osc.type = 'sawtooth';
             osc.frequency.setValueAtTime(150, audioCtx.currentTime);
             osc.frequency.linearRampToValueAtTime(80, audioCtx.currentTime + 0.4);
@@ -350,6 +352,11 @@
         switchScreen('start-screen');
     }
 
+    // 生成随机整数 (min 到 max，包含 min 和 max)
+    function getRandomInt(min, max) {
+        return Math.floor(Math.random() * (max - min + 1)) + min;
+    }
+
     function nextQuestion() {
         if (currentScore >= targetScore) {
             gameClear();
@@ -363,17 +370,36 @@
         let num1, num2, symbol, textToRead;
 
         if (type === 0) {
-            // 加法
-            num1 = Math.floor(Math.random() * 19) + 1;
+            // --- 加法: A + B (A,B >= 2, Sum <= 20) ---
+            
+            // 1. 确定 num1 (第一个加数)
+            // 最小是 2
+            // 最大是 18 (因为 num2 至少是 2，总和 <= 20，所以 20 - 2 = 18)
+            num1 = getRandomInt(2, 18);
+            
+            // 2. 确定 num2 (第二个加数)
+            // 最小是 2
+            // 最大是 20 - num1
             const maxNum2 = 20 - num1;
-            num2 = Math.floor(Math.random() * maxNum2) + 1;
+            num2 = getRandomInt(2, maxNum2);
+            
             currentAnswer = num1 + num2;
             symbol = '+';
             textToRead = `${num1} 加 ${num2} 等于多少？`;
+        
         } else {
-            // 减法
-            num1 = Math.floor(Math.random() * 20) + 1;
-            num2 = Math.floor(Math.random() * (num1 + 1));
+            // --- 减法: A - B (B >= 2, A <= 20, Result >= 0) ---
+            
+            // 1. 确定 num1 (被减数)
+            // 最小是 2 (因为减数至少是 2)
+            // 最大是 20
+            num1 = getRandomInt(2, 20);
+            
+            // 2. 确定 num2 (减数)
+            // 最小是 2
+            // 最大是 num1 (保证结果非负)
+            num2 = getRandomInt(2, num1);
+            
             currentAnswer = num1 - num2;
             symbol = '-';
             textToRead = `${num1} 减 ${num2} 等于多少？`;
@@ -390,6 +416,8 @@
         
         let options = new Set();
         options.add(correctAnswer);
+        
+        // 生成干扰项 (干扰项也尽量合理，0-20之间)
         while(options.size < 6) {
             let wrong = Math.floor(Math.random() * 21);
             if (wrong !== correctAnswer) options.add(wrong);
@@ -401,16 +429,14 @@
             const btn = document.createElement('button');
             btn.className = 'option-btn';
             btn.innerText = opt;
-            // 将 onclick 事件绑定修改
             btn.onclick = () => checkAnswer(btn, opt);
             container.appendChild(btn);
         });
     }
 
-    // 核心修改：检查答案逻辑
     function checkAnswer(btn, value) {
-        if (isProcessing) return; // 如果正在处理（比如显示答案中），不允许点击
-        isProcessing = true; // 锁定界面
+        if (isProcessing) return; 
+        isProcessing = true; 
 
         if (value === currentAnswer) {
             // --- 答对 ---
@@ -419,18 +445,17 @@
             currentScore++;
             updateProgress();
             
-            // 1秒后下一题
             setTimeout(() => {
                 nextQuestion();
             }, 1000);
 
         } else {
             // --- 答错 ---
-            mistakeCount++; // 记一次过
-            btn.classList.add('wrong'); // 选错的变红
+            mistakeCount++;
+            btn.classList.add('wrong');
             playSound('wrong');
 
-            // 自动找出正确的按钮并变绿
+            // 自动找出正确答案
             const allBtns = document.querySelectorAll('.option-btn');
             allBtns.forEach(b => {
                 if (parseInt(b.innerText) === currentAnswer) {
@@ -438,7 +463,7 @@
                 }
             });
 
-            // 1.5秒让孩子看清答案，然后自动换新题（不加分）
+            // 答错后自动换新题 (不加分)
             setTimeout(() => {
                 nextQuestion();
             }, 1500);
@@ -458,13 +483,10 @@
         const secs = seconds % 60;
         const timeString = mins > 0 ? `${mins}分${secs}秒` : `${secs}秒`;
 
-        // 计算正确率
-        // 总尝试次数 = 答对的10次 + 答错的次数
         const totalAttempts = targetScore + mistakeCount;
         const accuracy = Math.round((targetScore / totalAttempts) * 100);
         const accuracyString = `${accuracy}%`;
 
-        // 保存历史记录
         saveHistory(timeString, accuracyString);
 
         switchScreen('result-screen');
