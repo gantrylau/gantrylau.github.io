@@ -1,7 +1,5 @@
----
 title: ""
 show_title: false
----
 
 # AI 制作的儿童小游戏
 
