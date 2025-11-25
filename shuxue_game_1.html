@@ -1,0 +1,531 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>趣味数学大闯关</title>
+    <style>
+        :root {
+            --primary-color: #FF9F43;
+            --success-color: #2ECC71;
+            --error-color: #E74C3C;
+            --bg-color: #f0f8ff;
+            --text-color: #2c3e50;
+            --secondary-btn-color: #576574;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-color);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+            overflow: hidden;
+            user-select: none;
+        }
+
+        .container {
+            background: white;
+            padding: 20px;
+            border-radius: 20px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            width: 90%;
+            max-width: 500px;
+            text-align: center;
+            position: relative;
+            max-height: 90vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        h1 {
+            color: var(--text-color);
+            margin-bottom: 10px;
+            font-size: 1.8rem;
+        }
+
+        /* 进度条 */
+        .progress-bar {
+            width: 100%;
+            height: 10px;
+            background-color: #eee;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            overflow: hidden;
+            flex-shrink: 0;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background-color: var(--primary-color);
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+
+        /* 题目显示 */
+        .question-box {
+            font-size: 3.5rem;
+            font-weight: bold;
+            color: var(--text-color);
+            margin: 15px 0;
+            min-height: 70px;
+        }
+
+        /* 选项网格 */
+        .options-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+            margin-top: 10px;
+            flex-grow: 1;
+        }
+
+        .option-btn {
+            background-color: #54a0ff;
+            color: white;
+            border: none;
+            border-radius: 15px;
+            font-size: 1.8rem;
+            padding: 15px;
+            cursor: pointer;
+            box-shadow: 0 4px #2e86de;
+            transition: all 0.1s;
+        }
+
+        .option-btn:active {
+            transform: translateY(4px);
+            box-shadow: none;
+        }
+
+        .option-btn.correct {
+            background-color: var(--success-color);
+            box-shadow: 0 4px #27ae60;
+        }
+
+        .option-btn.wrong {
+            background-color: var(--error-color);
+            box-shadow: 0 4px #c0392b;
+            animation: shake 0.5s;
+        }
+
+        /* 界面切换 */
+        .screen {
+            display: none;
+            width: 100%;
+        }
+
+        .screen.active {
+            display: block;
+        }
+
+        /* 按钮通用样式 */
+        .btn {
+            font-size: 1.3rem;
+            padding: 12px 30px;
+            color: white;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            margin: 10px;
+            width: 80%;
+            max-width: 250px;
+        }
+        
+        .start-btn {
+            background-color: var(--success-color);
+            box-shadow: 0 5px #27ae60;
+        }
+
+        .history-btn {
+            background-color: var(--secondary-btn-color);
+            box-shadow: 0 5px #222f3e;
+            font-size: 1rem;
+        }
+
+        .btn:active {
+            transform: translateY(5px);
+            box-shadow: none;
+        }
+
+        .result-info {
+            font-size: 1.5rem;
+            color: var(--primary-color);
+            margin: 15px 0;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        
+        .result-detail {
+            font-size: 1rem;
+            color: #7f8c8d;
+        }
+
+        /* 历史记录样式 */
+        .history-list {
+            list-style: none;
+            padding: 0;
+            margin: 10px 0;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        .history-item {
+            background: #f8f9fa;
+            border-bottom: 1px solid #eee;
+            padding: 12px 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.85rem;
+            color: #555;
+        }
+        
+        .history-item:first-child {
+            border-top-left-radius: 10px;
+            border-top-right-radius: 10px;
+            background-color: #fff3e0;
+            font-weight: bold;
+            color: #d35400;
+        }
+
+        .history-item:last-child {
+            border-bottom-left-radius: 10px;
+            border-bottom-right-radius: 10px;
+            border-bottom: none;
+        }
+        
+        .history-date {
+            flex: 1;
+            text-align: left;
+        }
+        
+        .history-tags {
+            display: flex;
+            gap: 5px;
+        }
+        
+        .tag {
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-size: 0.8rem;
+            color: white;
+        }
+        
+        .tag-acc { background-color: var(--primary-color); }
+        .tag-time { background-color: #3498db; }
+
+        .empty-history {
+            color: #999;
+            padding: 20px;
+            font-style: italic;
+        }
+
+        @keyframes shake {
+            0% { transform: translateX(0); }
+            25% { transform: translateX(-10px); }
+            50% { transform: translateX(10px); }
+            75% { transform: translateX(-10px); }
+            100% { transform: translateX(0); }
+        }
+
+        @media (max-width: 600px) {
+            .question-box { font-size: 2.5rem; }
+            .option-btn { font-size: 1.4rem; padding: 12px; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <!-- 开始界面 -->
+        <div id="start-screen" class="screen active">
+            <h1>🧮 数学大挑战</h1>
+            <p>20以内加减法，答对10题通关</p>
+            <br>
+            <button class="btn start-btn" onclick="startGame()">开始挑战</button>
+            <br>
+            <button class="btn history-btn" onclick="showHistory()">📜 查看历史记录</button>
+        </div>
+
+        <!-- 游戏界面 -->
+        <div id="game-screen" class="screen">
+            <div class="progress-bar">
+                <div id="progress-fill" class="progress-fill"></div>
+            </div>
+            <div style="font-size: 1rem; color: #777;">第 <span id="current-q">1</span>/10 题</div>
+            <div id="question-display" class="question-box"></div>
+            <div id="options-container" class="options-grid">
+                <!-- 选项通过JS生成 -->
+            </div>
+        </div>
+
+        <!-- 结算界面 -->
+        <div id="result-screen" class="screen">
+            <h1>🎉 挑战成功！</h1>
+            <div class="result-info">
+                <div>耗时: <span id="final-time"></span></div>
+                <div>正确率: <span id="final-accuracy"></span></div>
+            </div>
+            <button class="btn start-btn" onclick="resetGame()">再玩一次</button>
+            <button class="btn history-btn" onclick="showHistory()">查看记录</button>
+        </div>
+
+        <!-- 历史记录界面 -->
+        <div id="history-screen" class="screen">
+            <h1>🏆 挑战记录</h1>
+            <p style="font-size: 0.8rem; color: #888;">保留最近10次记录</p>
+            <ul id="history-list" class="history-list">
+                <!-- 列表由JS生成 -->
+            </ul>
+            <button class="btn history-btn" onclick="backToStart()">🔙 返回</button>
+        </div>
+    </div>
+
+<script>
+    // 游戏状态变量
+    let currentScore = 0;
+    const targetScore = 10;
+    let mistakeCount = 0; // 新增：错误计数
+    let startTime = 0;
+    let currentAnswer = 0;
+    let isProcessing = false;
+
+    // 音频上下文
+    const AudioContext = window.AudioContext || window.webkitAudioContext;
+    let audioCtx;
+
+    function initAudio() {
+        if (!audioCtx) {
+            audioCtx = new AudioContext();
+        }
+        if (audioCtx.state === 'suspended') {
+            audioCtx.resume();
+        }
+    }
+
+    function playSound(type) {
+        if (!audioCtx) return;
+        const osc = audioCtx.createOscillator();
+        const gainNode = audioCtx.createGain();
+        osc.connect(gainNode);
+        gainNode.connect(audioCtx.destination);
+
+        if (type === 'correct') {
+            osc.type = 'sine';
+            osc.frequency.setValueAtTime(500, audioCtx.currentTime);
+            osc.frequency.exponentialRampToValueAtTime(1000, audioCtx.currentTime + 0.1);
+            gainNode.gain.setValueAtTime(0.3, audioCtx.currentTime);
+            gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.5);
+            osc.start();
+            osc.stop(audioCtx.currentTime + 0.5);
+        } else {
+            osc.type = 'sawtooth';
+            osc.frequency.setValueAtTime(150, audioCtx.currentTime);
+            osc.frequency.linearRampToValueAtTime(100, audioCtx.currentTime + 0.3);
+            gainNode.gain.setValueAtTime(0.3, audioCtx.currentTime);
+            gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.3);
+            osc.start();
+            osc.stop(audioCtx.currentTime + 0.3);
+        }
+    }
+
+    function speakQuestion(text) {
+        if ('speechSynthesis' in window) {
+            window.speechSynthesis.cancel();
+            const utterance = new SpeechSynthesisUtterance(text);
+            utterance.lang = 'zh-CN';
+            utterance.rate = 0.9;
+            utterance.pitch = 1.1;
+            window.speechSynthesis.speak(utterance);
+        }
+    }
+
+    function startGame() {
+        initAudio();
+        switchScreen('game-screen');
+        
+        currentScore = 0;
+        mistakeCount = 0; // 重置错误数
+        startTime = new Date();
+        updateProgress();
+        nextQuestion();
+    }
+
+    function resetGame() {
+        switchScreen('start-screen');
+    }
+
+    function nextQuestion() {
+        if (currentScore >= targetScore) {
+            gameClear();
+            return;
+        }
+
+        isProcessing = false;
+        document.getElementById('current-q').innerText = currentScore + 1;
+        
+        const type = Math.random() > 0.5 ? 0 : 1;
+        let num1, num2, symbol, textToRead;
+
+        if (type === 0) {
+            // 加法
+            num1 = Math.floor(Math.random() * 19) + 1;
+            const maxNum2 = 20 - num1;
+            num2 = Math.floor(Math.random() * maxNum2) + 1;
+            currentAnswer = num1 + num2;
+            symbol = '+';
+            textToRead = `${num1} 加 ${num2} 等于多少？`;
+        } else {
+            // 减法
+            num1 = Math.floor(Math.random() * 20) + 1;
+            num2 = Math.floor(Math.random() * (num1 + 1));
+            currentAnswer = num1 - num2;
+            symbol = '-';
+            textToRead = `${num1} 减 ${num2} 等于多少？`;
+        }
+
+        document.getElementById('question-display').innerText = `${num1} ${symbol} ${num2} = ?`;
+        speakQuestion(textToRead);
+        generateOptions(currentAnswer);
+    }
+
+    function generateOptions(correctAnswer) {
+        const container = document.getElementById('options-container');
+        container.innerHTML = '';
+        
+        let options = new Set();
+        options.add(correctAnswer);
+        while(options.size < 6) {
+            let wrong = Math.floor(Math.random() * 21);
+            if (wrong !== correctAnswer) options.add(wrong);
+        }
+
+        const optionsArray = Array.from(options).sort(() => Math.random() - 0.5);
+
+        optionsArray.forEach(opt => {
+            const btn = document.createElement('button');
+            btn.className = 'option-btn';
+            btn.innerText = opt;
+            btn.onclick = () => checkAnswer(btn, opt);
+            container.appendChild(btn);
+        });
+    }
+
+    function checkAnswer(btn, value) {
+        if (isProcessing) return;
+
+        if (value === currentAnswer) {
+            isProcessing = true;
+            btn.classList.add('correct');
+            playSound('correct');
+            currentScore++;
+            updateProgress();
+            setTimeout(() => nextQuestion(), 800);
+        } else {
+            mistakeCount++; // 记录错误
+            btn.classList.add('wrong');
+            playSound('wrong');
+            setTimeout(() => btn.classList.remove('wrong'), 500);
+        }
+    }
+
+    function updateProgress() {
+        const percent = (currentScore / targetScore) * 100;
+        document.getElementById('progress-fill').style.width = `${percent}%`;
+    }
+
+    function gameClear() {
+        const endTime = new Date();
+        const timeDiff = endTime - startTime;
+        const seconds = Math.floor(timeDiff / 1000);
+        const mins = Math.floor(seconds / 60);
+        const secs = seconds % 60;
+        const timeString = mins > 0 ? `${mins}分${secs}秒` : `${secs}秒`;
+
+        // 计算正确率
+        const totalAttempts = targetScore + mistakeCount;
+        const accuracy = Math.round((targetScore / totalAttempts) * 100);
+        const accuracyString = `${accuracy}%`;
+
+        // 保存历史记录
+        saveHistory(timeString, accuracyString);
+
+        switchScreen('result-screen');
+        document.getElementById('final-time').innerText = timeString;
+        document.getElementById('final-accuracy').innerText = accuracyString;
+        
+        let speechText = `恭喜你！通关成功。耗时${timeString}`;
+        if (accuracy === 100) {
+            speechText += "，正确率百分之百，太棒了！";
+        } else {
+            speechText += `，正确率${accuracyString}`;
+        }
+        speakQuestion(speechText);
+    }
+
+    // --- 历史记录相关功能 ---
+
+    function saveHistory(duration, accuracy) {
+        let history = JSON.parse(localStorage.getItem('mathGameHistory') || '[]');
+        
+        const now = new Date();
+        const dateStr = `${now.getMonth()+1}月${now.getDate()}日 ${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`;
+        
+        history.unshift({
+            date: dateStr,
+            duration: duration,
+            accuracy: accuracy
+        });
+
+        if (history.length > 10) {
+            history = history.slice(0, 10);
+        }
+
+        localStorage.setItem('mathGameHistory', JSON.stringify(history));
+    }
+
+    function showHistory() {
+        initAudio(); 
+        switchScreen('history-screen');
+        const list = document.getElementById('history-list');
+        list.innerHTML = '';
+        
+        const history = JSON.parse(localStorage.getItem('mathGameHistory') || '[]');
+
+        if (history.length === 0) {
+            list.innerHTML = '<div class="empty-history">暂无挑战记录，快去开始吧！</div>';
+            return;
+        }
+
+        history.forEach((item, index) => {
+            const acc = item.accuracy ? item.accuracy : '-'; // 兼容旧数据
+            
+            const li = document.createElement('li');
+            li.className = 'history-item';
+            li.innerHTML = `
+                <span class="history-date">${index + 1}. ${item.date}</span>
+                <div class="history-tags">
+                    <span class="tag tag-acc">✅ ${acc}</span>
+                    <span class="tag tag-time">⏱️ ${item.duration}</span>
+                </div>
+            `;
+            list.appendChild(li);
+        });
+    }
+
+    function backToStart() {
+        switchScreen('start-screen');
+    }
+
+    function switchScreen(screenId) {
+        document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+        document.getElementById(screenId).classList.add('active');
+    }
+
+</script>
+</body>
+</html>
